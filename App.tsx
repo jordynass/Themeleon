@@ -1,4 +1,4 @@
-import { Button, StyleSheet, View } from 'react-native';
+import { Button, FlatList, ScrollView, View } from 'react-native';
 import Card, {CardTheme, CardContent} from './card';
 import { useState } from 'react';
 import { FakeClient } from './client';
@@ -9,7 +9,7 @@ const client = new FakeClient();
 const CARD_BATCH_SIZE = 10;
 
 export default function App() {
-  const [cardTheme, setCardTheme] = useState<CardTheme>({backgroundColor: 'gray', textColor: 'green'});
+  const [cardTheme, setCardTheme] = useState<CardTheme>({backgroundColor: 'black', textColor: 'white'});
   const [cardData, setCardData] = useState<CardData[]>([]);
 
   function loadCards(batchSize: number = CARD_BATCH_SIZE) {
@@ -24,21 +24,18 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      {cardData.map(({id, theme, content}) => <Card key={id} theme={theme} content={content} />)}
-      <Button onPress={() => loadCards()} title={`Load ${CARD_BATCH_SIZE} more buttons`}/>
+    <View className="flex-col flex-1 items-center justify-start p-4 gap-4">
+      <View>
+        <Button onPress={() => loadCards()} title={`Load ${CARD_BATCH_SIZE} more buttons`}/>
+      </View>
+      <FlatList
+          data={cardData}
+          renderItem={({item}) => <Card key={item.id} theme={item.theme} content={item.content} />}
+          keyExtractor={item => String(item.id)}
+          contentContainerClassName="flex-col flex-1 items-stretch justify-start gap-4 px-5 max-w-xl" />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 type CardData = {
   id: number,

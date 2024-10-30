@@ -11,7 +11,7 @@ type Props = {
 export default function Card({theme, content}: Props): ReactElement {
   const styles = parseStyleSheet(theme);
   return (
-    <View className="rounded" style={styles.container}>
+    <View className="rounded p-2" style={styles.container}>
       <Text style={styles.body}>{content.body}</Text>
     </View>
   )
