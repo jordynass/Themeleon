@@ -2,8 +2,8 @@ import { ReactElement } from "react";
 import { View, StyleSheet, Text } from "react-native";
 
 type Props = {
-  theme: Theme,
-  content: Content
+  theme: CardTheme,
+  content: CardContent
 }
 
 export default function Card({theme, content}: Props): ReactElement {
@@ -15,7 +15,7 @@ export default function Card({theme, content}: Props): ReactElement {
   )
 }
 
-function parseStyleSheet(theme: Theme): StyleSheet.NamedStyles<any> {
+function parseStyleSheet(theme: CardTheme): StyleSheet.NamedStyles<any> {
   return StyleSheet.create({
     container: {
       backgroundColor: theme.backgroundColor
@@ -26,11 +26,11 @@ function parseStyleSheet(theme: Theme): StyleSheet.NamedStyles<any> {
   });
 }
 
-type Content = {
+export type CardContent = {
   body: string,
 };
 
-export type Theme = {
+export type CardTheme = {
   backgroundColor: string,
   textColor: string,
 };
