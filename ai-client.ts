@@ -23,5 +23,16 @@ export class GoogleAIClient extends AIClient {
 }
 
 function formatPromptForRequest(themePrompt: string): string {
-  return `Tell me a story about ${themePrompt}. Keep it under 100 words`;
+  return `You are designing an app. Its visual theme is ${themePrompt}.
+The visual theme has 2 parameters: backgroundColor and textColor. You must choose
+both colors so that
+1) They evoke the theme of ${themePrompt}
+2) They are in a formatted as comma-separated rgb values from 0 to 255
+3) The contrast between the two colors is strong enough that Text written in textColor with show up on a backgroundColor background.
+
+Respond in an XML object called <Theme> containing tags <textColor> and <backgroundColor>. For example:
+<Theme>
+  <backgroundColor>20,40,50</backgroundColor>
+  <textColor>200,250,225</textColor>
+</Theme>`;
 }

@@ -4,7 +4,7 @@ export abstract class DataClient {
 
 export class FakeDataClient extends DataClient {
   constructor(
-      private readonly dummyContent: string = 'NO TV AND NO BEER MAKE HOMER GO CRAZY.',
+      private readonly dummyContent: string = 'No TV and no beer make Homer go crazy.',
       private readonly maxCopies: number = 20) {
     super();
   }

@@ -13,7 +13,6 @@ const CARD_BATCH_SIZE = 10;
 const CARD_GAP = 10;
 
 export default function App() {
-  const [cardTheme, setCardTheme] = useState<CardTheme>({backgroundColor: 'black', textColor: 'white'});
   const [cardData, setCardData] = useState<CardData[]>([]);
   const [cardDataById, setCardDataById] = useState(new Map<number, CardData>());
   const [listHeightFull, setListHeightFull] = useState<number>(-CARD_GAP);
@@ -22,6 +21,7 @@ export default function App() {
   const [themeQuery, setThemeQuery] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
 
+  const cardTheme = useRef<CardTheme>({backgroundColor: 'black', textColor: 'white'})
   const aiClient = useRef<AIClient|null>(null);
   const cancelCardLoads = useRef<boolean>(false);
   const disableThemeRequest = useRef<boolean>(false);
@@ -40,7 +40,7 @@ export default function App() {
       const body = newCardBodies[i];
       const cardData = {
         id: nextId + i,
-        theme: cardTheme,
+        theme: cardTheme.current,
         content: {body},
       }
       newCardData.push(cardData);
@@ -83,7 +83,7 @@ export default function App() {
     disableThemeRequest.current = true;
     try {
       const response = await aiClient.current.getThemeForPrompt(themeQuery);
-      setCardTheme(parseAIResponse(response));
+      cardTheme.current = parseAIResponse(response);
     } catch (e) {
       console.error(`Failed to reach AI backend or parse response. Error:\n${e}`)
     } finally {
@@ -114,7 +114,15 @@ export default function App() {
 }
 
 function parseAIResponse(aiResponse: string): CardTheme {
-  return {backgroundColor: 'pink', textColor: 'blue'};
+  return {
+    backgroundColor: `rgb(${getTag(aiResponse, 'backgroundColor')})`,
+    textColor: `rgb(${getTag(aiResponse, 'textColor')})`,
+  };
+}
+
+function getTag(xmlString: string, tagName: string): string {
+  const regex = new RegExp(`<${tagName}>(.*?)</${tagName}>`);
+  return xmlString.match(regex)![1];
 }
 
 type CardData = {
