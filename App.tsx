@@ -1,9 +1,10 @@
-import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, SafeAreaView } from 'react-native';
+import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, SafeAreaView, View } from 'react-native';
 import Card, {CardTheme, CardContent} from './card';
 import { useEffect, useRef, useState } from 'react';
 import { FakeClient } from './client';
 
 import "./global.css";
+import { Button, TextInput } from 'react-native-paper';
 
 const client = new FakeClient();
 
@@ -17,6 +18,7 @@ export default function App() {
   const [listHeightFull, setListHeightFull] = useState<number>(-CARD_GAP);
   const [listHeightVisible, setListHeightVisible] = useState<number>(0);
   const [listOffset, setListOffset] = useState<number>(0);
+  const [themeQuery, setThemeQuery] = useState<string>('');
   const cancelCardLoads = useRef<boolean>(false);
 
   useEffect(() => {
@@ -70,8 +72,17 @@ export default function App() {
     }
   }
 
+  function requestTheme() {
+    console.log(themeQuery);
+    setThemeQuery('');
+  }
+
   return (
     <SafeAreaView className="flex-col flex-1 items-center justify-start p-4 gap-4">
+      <View className="flex-col gap-2 items-center">
+        <TextInput label="Theme prompt" value={themeQuery} onChangeText={setThemeQuery} placeholder="Space"/>
+        <Button onPress={requestTheme} mode='contained'>Update Visual Theme</Button>
+      </View>
       <FlatList
           data={cardData}
           renderItem={({item}) => <Card onLayout={e => handleCardLayout(e, item.id)} key={item.id} theme={item.theme} content={item.content} />}
