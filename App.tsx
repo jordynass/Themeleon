@@ -1,12 +1,13 @@
 import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, SafeAreaView, View } from 'react-native';
 import Card, {CardTheme, CardContent} from './card';
 import { useEffect, useRef, useState } from 'react';
-import { FakeClient } from './client';
+import { FakeDataClient } from './data-client';
 
 import "./global.css";
 import { Button, TextInput } from 'react-native-paper';
+import { AIClient, GoogleAIClient } from './ai-client';
 
-const client = new FakeClient();
+const client = new FakeDataClient();
 
 const CARD_BATCH_SIZE = 10;
 const CARD_GAP = 10;
@@ -19,7 +20,11 @@ export default function App() {
   const [listHeightVisible, setListHeightVisible] = useState<number>(0);
   const [listOffset, setListOffset] = useState<number>(0);
   const [themeQuery, setThemeQuery] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>('');
+
+  const aiClient = useRef<AIClient|null>(null);
   const cancelCardLoads = useRef<boolean>(false);
+  const disableThemeRequest = useRef<boolean>(false);
 
   useEffect(() => {
     loadCards(CARD_BATCH_SIZE * 2);
@@ -72,16 +77,27 @@ export default function App() {
     }
   }
 
-  function requestTheme() {
-    console.log(themeQuery);
+  async function requestTheme() {
+    aiClient.current = aiClient.current ?? new GoogleAIClient(apiKey);
+
+    disableThemeRequest.current = true;
+    try {
+      const response = await aiClient.current.getThemeForPrompt(themeQuery);
+      setCardTheme(parseAIResponse(response));
+    } catch (e) {
+      console.error(`Failed to reach AI backend or parse response. Error:\n${e}`)
+    } finally {
+      disableThemeRequest.current = false;
+      setThemeQuery('');
+    }
     setThemeQuery('');
   }
 
   return (
     <SafeAreaView className="flex-col flex-1 items-center justify-start p-4 gap-4">
       <View className="flex-col gap-2 items-center">
-        <TextInput label="Theme prompt" value={themeQuery} onChangeText={setThemeQuery} placeholder="Space"/>
-        <Button onPress={requestTheme} mode='contained'>Update Visual Theme</Button>
+        <TextInput label="Theme prompt" value={themeQuery} onChangeText={setThemeQuery} placeholder="Space" />
+        <Button onPress={requestTheme} mode='contained' disabled={disableThemeRequest.current}>Update Visual Theme</Button>
       </View>
       <FlatList
           data={cardData}
@@ -92,8 +108,13 @@ export default function App() {
           onScroll={handleScroll}
           scrollEventThrottle={20} 
           onLayout={handleListLayout} />
+      <TextInput label="Gemini API Key" value={apiKey} onChangeText={setApiKey} secureTextEntry={true} />
     </SafeAreaView>
   );
+}
+
+function parseAIResponse(aiResponse: string): CardTheme {
+  return {backgroundColor: 'pink', textColor: 'blue'};
 }
 
 type CardData = {

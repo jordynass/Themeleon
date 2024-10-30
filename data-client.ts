@@ -1,8 +1,8 @@
-export abstract class Client {
+export abstract class DataClient {
   abstract getCardContent(cursor: string, size: any): Promise<string[]>;
 }
 
-export class FakeClient extends Client {
+export class FakeDataClient extends DataClient {
   constructor(
       private readonly dummyContent: string = 'NO TV AND NO BEER MAKE HOMER GO CRAZY.',
       private readonly maxCopies: number = 20) {
