@@ -1,6 +1,8 @@
 import { ReactElement } from "react";
 import { View, StyleSheet, Text } from "react-native";
 
+import "./global.css";
+
 type Props = {
   theme: CardTheme,
   content: CardContent
@@ -9,7 +11,7 @@ type Props = {
 export default function Card({theme, content}: Props): ReactElement {
   const styles = parseStyleSheet(theme);
   return (
-    <View style={styles.container}>
+    <View className="rounded" style={styles.container}>
       <Text style={styles.body}>{content.body}</Text>
     </View>
   )

@@ -1,8 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
 import Card, {CardTheme, CardContent} from './card';
 import { useState } from 'react';
 import { FakeClient } from './client';
+
+import "./global.css";
 
 const client = new FakeClient();
 const CARD_BATCH_SIZE = 10;
