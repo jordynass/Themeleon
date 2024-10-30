@@ -1,4 +1,4 @@
-import { Button, FlatList, ScrollView, View } from 'react-native';
+import { Button, FlatList, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
 import Card, {CardTheme, CardContent} from './card';
 import { useState } from 'react';
 import { FakeClient } from './client';
@@ -23,6 +23,10 @@ export default function App() {
     setCardData([...cardData, ...newCardData]);
   }
 
+  function handleScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
+    console.log(e);
+  }
+
   return (
     <View className="flex-col flex-1 items-center justify-start p-4 gap-4">
       <View>
@@ -32,7 +36,9 @@ export default function App() {
           data={cardData}
           renderItem={({item}) => <Card key={item.id} theme={item.theme} content={item.content} />}
           keyExtractor={item => String(item.id)}
-          contentContainerClassName="flex-col flex-1 items-stretch justify-start gap-4 px-5 max-w-xl" />
+          contentContainerClassName="flex-col flex-1 items-stretch justify-start gap-4 px-5 max-w-xl" 
+          onScroll={handleScroll}
+          scrollEventThrottle={20}/>
     </View>
   );
 }
