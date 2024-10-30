@@ -1,18 +1,21 @@
 import { ReactElement } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, LayoutChangeEvent } from "react-native";
 
 import "./global.css";
 
 type Props = {
   theme: CardTheme,
-  content: CardContent
+  content: CardContent,
+  onLayout: (event: LayoutChangeEvent) => void,
 }
 
-export default function Card({theme, content}: Props): ReactElement {
+export default function Card({theme, content, onLayout}: Props): ReactElement {
   const styles = parseStyleSheet(theme);
   return (
-    <View className="rounded p-2" style={styles.container}>
-      <Text style={styles.body}>{content.body}</Text>
+    <View>
+      <View className="rounded p-2" style={styles.container} onLayout={onLayout}>
+        <Text style={styles.body}>{content.body}</Text>
+      </View>
     </View>
   )
 }

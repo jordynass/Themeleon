@@ -1,5 +1,5 @@
 export abstract class Client {
-  abstract getCardContent(cursor: string, size: any): string[];
+  abstract getCardContent(cursor: string, size: any): Promise<string[]>;
 }
 
 export class FakeClient extends Client {
@@ -9,12 +9,12 @@ export class FakeClient extends Client {
     super();
   }
 
-  generateCardContent(): string {
+  private generateCardContent(): string {
     const numCopies = Math.floor(Math.random() * this.maxCopies + 1);
     return (new Array(numCopies).fill(this.dummyContent)).join(' ');
   }
 
-  getCardContent(cursor: string, size: any): string[] {
+  async getCardContent(cursor: string, size: any): Promise<string[]> {
     return Array.from({length: size}, () => this.generateCardContent());
   }
 }
