@@ -1,16 +1,20 @@
 import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, SafeAreaView, View } from 'react-native';
+import { Button, TextInput } from 'react-native-paper';
+import { GoogleAIClient } from './ai-client';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Card, {CardTheme, CardContent} from './card';
 import { useEffect, useRef, useState } from 'react';
 import { FakeDataClient } from './data-client';
 
 import "./global.css";
-import { Button, TextInput } from 'react-native-paper';
-import { AIClient, GoogleAIClient } from './ai-client';
 
-const client = new FakeDataClient();
+const cardClient = new FakeDataClient();
 
 const CARD_BATCH_SIZE = 10;
 const CARD_GAP = 10;
+const GEMINI_API_LOCAL_STORAGE_KEY = 'Themelon Gemini API Key';
 
 export default function App() {
   const [cardData, setCardData] = useState<CardData[]>([]);
@@ -20,11 +24,10 @@ export default function App() {
   const [listOffset, setListOffset] = useState<number>(0);
   const [themeQuery, setThemeQuery] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
+  const [isLoadingTheme, setIsLoadingTheme] = useState<boolean>(false);
 
-  const cardTheme = useRef<CardTheme>({backgroundColor: 'black', textColor: 'white'})
-  const aiClient = useRef<AIClient|null>(null);
+  const cardTheme = useRef<CardTheme>({backgroundColor: 'black', textColor: 'white'});
   const cancelCardLoads = useRef<boolean>(false);
-  const disableThemeRequest = useRef<boolean>(false);
 
   useEffect(() => {
     loadCards(CARD_BATCH_SIZE * 2);
@@ -32,7 +35,7 @@ export default function App() {
   }, [])
 
   async function loadCards(batchSize: number = CARD_BATCH_SIZE) {
-    const newCardBodies = await client.getCardContent('any cursor', batchSize);
+    const newCardBodies = await cardClient.getCardContent('any cursor', batchSize);
     const nextId = cardData.length;
     const newCardData: CardData[] = [];
     const newCardDataById = new Map<number, CardData>();
@@ -77,27 +80,37 @@ export default function App() {
     }
   }
 
-  async function requestTheme() {
-    aiClient.current = aiClient.current ?? new GoogleAIClient(apiKey);
+  function handleNoApiKeyError() {
+    console.error('No API key provided or found in local storage')
+  }
 
-    disableThemeRequest.current = true;
-    try {
-      const response = await aiClient.current.getThemeForPrompt(themeQuery);
-      cardTheme.current = parseAIResponse(response);
-    } catch (e) {
-      console.error(`Failed to reach AI backend or parse response. Error:\n${e}`)
-    } finally {
-      disableThemeRequest.current = false;
-      setThemeQuery('');
+  async function requestTheme() {
+    const apiKeyWithFallback = apiKey || await AsyncStorage.getItem(GEMINI_API_LOCAL_STORAGE_KEY);
+    if (!apiKeyWithFallback) {
+      handleNoApiKeyError();
+      return;
     }
-    setThemeQuery('');
+
+    const themeClient = new GoogleAIClient(apiKeyWithFallback);
+    setIsLoadingTheme(true);
+
+    try {
+      const response = await themeClient.getThemeForPrompt(themeQuery);
+      cardTheme.current = parseAIResponse(response);
+      setThemeQuery('');
+      await AsyncStorage.setItem(GEMINI_API_LOCAL_STORAGE_KEY, apiKeyWithFallback);
+    } catch (e) {
+      console.error(`Failed to reach AI backend or parse response. Error:\n${e}`);
+    } finally {
+      setIsLoadingTheme(false);
+    }
   }
 
   return (
     <SafeAreaView className="flex-col flex-1 items-stretch justify-start p-4 gap-4">
       <View className="flex-col gap-2 items-center">
         <TextInput label="Theme prompt" value={themeQuery} onChangeText={setThemeQuery} placeholder="Space" />
-        <Button onPress={requestTheme} mode='contained' disabled={disableThemeRequest.current}>Update Visual Theme</Button>
+        <Button onPress={requestTheme} mode='contained' disabled={isLoadingTheme}>Update Visual Theme</Button>
       </View>
       <FlatList
           data={cardData}
