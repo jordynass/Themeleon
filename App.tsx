@@ -1,16 +1,16 @@
 import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, SafeAreaView, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
-import { GoogleAIClient } from './ai-client';
+import { GoogleAIClient } from './src/clients/ai-client';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
-import { FakeDataClient } from './data-client';
+import { FakeDataClient } from './src/clients/data-client';
 
 import "./global.css";
 import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, getCardListHeight, parseAIResponse, randomPermutation } from './src/shared/utils';
-import { CardContent, CardData, CardTheme } from './src/shared/types';
+import { CardData, CardTheme } from './src/shared/types';
 
 const cardClient = new FakeDataClient();
 
