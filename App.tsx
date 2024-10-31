@@ -9,26 +9,19 @@ import { useEffect, useRef, useState } from 'react';
 import { FakeDataClient } from './data-client';
 
 import "./global.css";
-import { parseAIResponse, randomPermutation } from './src/shared/utils';
-import { CardContent, CardTheme } from './src/shared/types';
+import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, getCardListHeight, parseAIResponse, randomPermutation } from './src/shared/utils';
+import { CardContent, CardData, CardTheme } from './src/shared/types';
 
 const cardClient = new FakeDataClient();
 
-const CARD_BATCH_SIZE = 10;
-const CARD_GAP = 10;
-const GEMINI_API_LOCAL_STORAGE_KEY = 'Themelon Gemini API Key';
-
 export default function App() {
   const [cardData, setCardData] = useState<CardData[]>([]);
-  const [cardDataById, setCardDataById] = useState(new Map<number, CardData>());
-  const [listHeightFull, setListHeightFull] = useState(-CARD_GAP);
   const [listHeightVisible, setListHeightVisible] = useState(0);
   const [listOffset, setListOffset] = useState(0);
   const [themeQuery, setThemeQuery] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [isLoadingTheme, setIsLoadingTheme] = useState(false);
 
-  const listHeightFullRef = useRef(-CARD_GAP);
   const cardTheme = useRef<CardTheme>({colors: ['200,200,200', '150,150,150'], icons: []});
   const cancelCardLoads = useRef(false);
   const isLoadingCards = useRef(false);
@@ -38,22 +31,17 @@ export default function App() {
     return () => { cancelCardLoads.current = true };
   }, []);
 
-  useEffect(() => {
-    if (listOffset + 2 * listHeightVisible < listHeightFullRef.current) {
-      return;
-    }
-    console.log(`listOffset ${listOffset} listHeightVisible ${listHeightVisible} listHeightFullRef.current ${listHeightFullRef.current}`);
-    loadCards();
-  }, [listOffset, listHeightVisible]);
+  const cardDataById = new Map<number, CardData>(cardData.map(cd => [cd.id, cd]));
 
   async function loadCards(batchSize: number = CARD_BATCH_SIZE) {
-    console.log('calling loadCards');
     if (isLoadingCards.current) {
       return;
     }
+
     isLoadingCards.current = true;
     const newCardBodies = await cardClient.getCardContent('any cursor', batchSize);
     isLoadingCards.current = false;
+
     const nextId = cardData.length;
     const newCardData: CardData[] = [];
     const newCardDataById = new Map<number, CardData>();
@@ -62,38 +50,43 @@ export default function App() {
       const colors = cardTheme.current.colors.length > 1 ?
           randomPermutation(cardTheme.current.colors, 3).map((rgbTriple: string) => `rgba(${rgbTriple},.3)`) :
           [...cardTheme.current.colors, ...cardTheme.current.colors]
-      const cardData = {
+      const newCard = {
         id: nextId + i,
         theme: {...cardTheme.current, colors},
         content: {body},
+        height: Infinity,
       }
-      newCardData.push(cardData);
-      newCardDataById.set(cardData.id, cardData);
+      newCardData.push(newCard);
+      newCardDataById.set(newCard.id, newCard);
     }
+
     if (cancelCardLoads.current) {
       return;
     }
-    console.log('setting loaded cards')
     setCardData([...cardData, ...newCardData]);
-    setCardDataById(new Map<number, CardData>([...cardDataById, ...newCardDataById]));
   }
 
   function handleCardLayout(e: LayoutChangeEvent, id: number) {
     const cardHeight = e.nativeEvent.layout.height;
 
-    listHeightFullRef.current += cardHeight + CARD_GAP;
-
-    const cardData = cardDataById.get(id);
-    cardData!.height = cardHeight;
+    const card = cardDataById.get(id);
+    card!.height = cardHeight;
+    
+    if (listOffset + 2 * listHeightVisible > getCardListHeight(cardData)) {
+      loadCards();
+    }
   }
 
   function handleListLayout(e: LayoutChangeEvent) {
     setListHeightVisible(e.nativeEvent.layout.height);
-    listHeightFullRef.current = -CARD_GAP; // Reset so cards can build it up as they are added
   }
 
   function handleScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const newOffset = e.nativeEvent.contentOffset.y;
+    if (newOffset + 2 * listHeightVisible > getCardListHeight(cardData)) {
+      loadCards();
+    }
+
     setListOffset(newOffset);
   }
 
@@ -143,11 +136,4 @@ export default function App() {
       </View>
     </SafeAreaView>
   );
-}
-
-type CardData = {
-  id: number,
-  theme: CardTheme,
-  content: CardContent,
-  height?: number,
 }
