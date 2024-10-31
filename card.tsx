@@ -12,10 +12,8 @@ type Props = {
 export default function Card({theme, content, onLayout}: Props): ReactElement {
   const styles = parseStyleSheet(theme);
   return (
-    <View>
-      <View className="rounded p-2" style={styles.container} onLayout={onLayout}>
-        <Text style={styles.body}>{content.body}</Text>
-      </View>
+    <View className="rounded p-2 max-w-xl" style={styles.container} onLayout={onLayout}>
+      <Text style={styles.body}>{content.body}</Text>
     </View>
   )
 }

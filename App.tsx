@@ -94,7 +94,7 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView className="flex-col flex-1 items-center justify-start p-4 gap-4">
+    <SafeAreaView className="flex-col flex-1 items-stretch justify-start p-4 gap-4">
       <View className="flex-col gap-2 items-center">
         <TextInput label="Theme prompt" value={themeQuery} onChangeText={setThemeQuery} placeholder="Space" />
         <Button onPress={requestTheme} mode='contained' disabled={disableThemeRequest.current}>Update Visual Theme</Button>
@@ -103,12 +103,14 @@ export default function App() {
           data={cardData}
           renderItem={({item}) => <Card onLayout={e => handleCardLayout(e, item.id)} key={item.id} theme={item.theme} content={item.content} />}
           keyExtractor={item => String(item.id)}
-          contentContainerClassName="flex-col flex-1 items-stretch justify-start px-5 max-w-xl" 
+          contentContainerClassName="flex-col flex-1 items-center justify-start px-5" 
           contentContainerStyle={{ gap: CARD_GAP }}
           onScroll={handleScroll}
           scrollEventThrottle={20} 
           onLayout={handleListLayout} />
-      <TextInput label="Gemini API Key" value={apiKey} onChangeText={setApiKey} secureTextEntry={true} />
+      <View className="flex-col items-center">
+        <TextInput label="Gemini API Key" value={apiKey} onChangeText={setApiKey} secureTextEntry={true} />
+      </View>
     </SafeAreaView>
   );
 }
