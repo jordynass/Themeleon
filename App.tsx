@@ -21,23 +21,39 @@ const GEMINI_API_LOCAL_STORAGE_KEY = 'Themelon Gemini API Key';
 export default function App() {
   const [cardData, setCardData] = useState<CardData[]>([]);
   const [cardDataById, setCardDataById] = useState(new Map<number, CardData>());
-  const [listHeightFull, setListHeightFull] = useState<number>(-CARD_GAP);
-  const [listHeightVisible, setListHeightVisible] = useState<number>(0);
-  const [listOffset, setListOffset] = useState<number>(0);
-  const [themeQuery, setThemeQuery] = useState<string>('');
-  const [apiKey, setApiKey] = useState<string>('');
-  const [isLoadingTheme, setIsLoadingTheme] = useState<boolean>(false);
+  const [listHeightFull, setListHeightFull] = useState(-CARD_GAP);
+  const [listHeightVisible, setListHeightVisible] = useState(0);
+  const [listOffset, setListOffset] = useState(0);
+  const [themeQuery, setThemeQuery] = useState('');
+  const [apiKey, setApiKey] = useState('');
+  const [isLoadingTheme, setIsLoadingTheme] = useState(false);
 
+  const listHeightFullRef = useRef(-CARD_GAP);
   const cardTheme = useRef<CardTheme>({colors: ['200,200,200', '150,150,150'], icons: []});
-  const cancelCardLoads = useRef<boolean>(false);
+  const cancelCardLoads = useRef(false);
+  const isLoadingCards = useRef(false);
 
   useEffect(() => {
     loadCards(CARD_BATCH_SIZE * 2);
-    () => { cancelCardLoads.current = true }
-  }, [])
+    return () => { cancelCardLoads.current = true };
+  }, []);
+
+  useEffect(() => {
+    if (listOffset + 2 * listHeightVisible < listHeightFullRef.current) {
+      return;
+    }
+    console.log(`listOffset ${listOffset} listHeightVisible ${listHeightVisible} listHeightFullRef.current ${listHeightFullRef.current}`);
+    loadCards();
+  }, [listOffset, listHeightVisible]);
 
   async function loadCards(batchSize: number = CARD_BATCH_SIZE) {
+    console.log('calling loadCards');
+    if (isLoadingCards.current) {
+      return;
+    }
+    isLoadingCards.current = true;
     const newCardBodies = await cardClient.getCardContent('any cursor', batchSize);
+    isLoadingCards.current = false;
     const nextId = cardData.length;
     const newCardData: CardData[] = [];
     const newCardDataById = new Map<number, CardData>();
@@ -57,6 +73,7 @@ export default function App() {
     if (cancelCardLoads.current) {
       return;
     }
+    console.log('setting loaded cards')
     setCardData([...cardData, ...newCardData]);
     setCardDataById(new Map<number, CardData>([...cardDataById, ...newCardDataById]));
   }
@@ -64,7 +81,7 @@ export default function App() {
   function handleCardLayout(e: LayoutChangeEvent, id: number) {
     const cardHeight = e.nativeEvent.layout.height;
 
-    setListHeightFull(lh => lh + cardHeight + CARD_GAP);
+    listHeightFullRef.current += cardHeight + CARD_GAP;
 
     const cardData = cardDataById.get(id);
     cardData!.height = cardHeight;
@@ -72,17 +89,12 @@ export default function App() {
 
   function handleListLayout(e: LayoutChangeEvent) {
     setListHeightVisible(e.nativeEvent.layout.height);
-    setListHeightFull(-CARD_GAP); // Reset so cards can build it up as they are added
+    listHeightFullRef.current = -CARD_GAP; // Reset so cards can build it up as they are added
   }
 
   function handleScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const newOffset = e.nativeEvent.contentOffset.y;
     setListOffset(newOffset);
-
-    // Load More cards if there is only one screen worth of results left
-    if (newOffset + 2 * listHeightVisible > listHeightFull) {
-      loadCards();
-    }
   }
 
   function handleNoApiKeyError() {
