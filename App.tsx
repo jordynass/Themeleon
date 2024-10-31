@@ -4,11 +4,13 @@ import { GoogleAIClient } from './ai-client';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import Card, {CardTheme, CardContent} from './card';
+import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
 import { FakeDataClient } from './data-client';
 
 import "./global.css";
+import { parseAIResponse, randomPermutation } from './src/shared/utils';
+import { CardContent, CardTheme } from './src/shared/types';
 
 const cardClient = new FakeDataClient();
 
@@ -26,7 +28,7 @@ export default function App() {
   const [apiKey, setApiKey] = useState<string>('');
   const [isLoadingTheme, setIsLoadingTheme] = useState<boolean>(false);
 
-  const cardTheme = useRef<CardTheme>({backgroundColor: 'black', textColor: 'white'});
+  const cardTheme = useRef<CardTheme>({colors: ['200,200,200', '150,150,150'], icons: []});
   const cancelCardLoads = useRef<boolean>(false);
 
   useEffect(() => {
@@ -41,9 +43,12 @@ export default function App() {
     const newCardDataById = new Map<number, CardData>();
     for (let i = 0; i < newCardBodies.length; i++) {
       const body = newCardBodies[i];
+      const colors = cardTheme.current.colors.length > 1 ?
+          randomPermutation(cardTheme.current.colors, 3).map((rgbTriple: string) => `rgba(${rgbTriple},.3)`) :
+          [...cardTheme.current.colors, ...cardTheme.current.colors]
       const cardData = {
         id: nextId + i,
-        theme: cardTheme.current,
+        theme: {...cardTheme.current, colors},
         content: {body},
       }
       newCardData.push(cardData);
@@ -126,18 +131,6 @@ export default function App() {
       </View>
     </SafeAreaView>
   );
-}
-
-function parseAIResponse(aiResponse: string): CardTheme {
-  return {
-    backgroundColor: `rgb(${getTag(aiResponse, 'backgroundColor')})`,
-    textColor: `rgb(${getTag(aiResponse, 'textColor')})`,
-  };
-}
-
-function getTag(xmlString: string, tagName: string): string {
-  const regex = new RegExp(`<${tagName}>(.*?)</${tagName}>`);
-  return xmlString.match(regex)![1];
 }
 
 type CardData = {
