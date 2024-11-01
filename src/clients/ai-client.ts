@@ -37,15 +37,13 @@ in decreasing order of relevance.
 </Colors>
 
 <Icons>
-Come up with a few simple icons (3 to 7) associated theme of ${themePrompt}. They should be simple objects that
-are simple enough that they can be recognizably drawn as an SVGs without much trouble. For instance,
+Come up with a few simple icons (3 to 5) associated theme of ${themePrompt} and design SVGs that a regular person
+can immediately identify. Their widths and heights should be under 80 pixels. For instance,
 
 Ireland: Clover, Irish flag, Cabbage, Mountain, Emerald, Harp
 Water: Wave, Fish, Pool, Swimsuit, Bucket
 Joy: Smiley face, Thumbs up, Love heart
 1960s: Peace sign, Yin Yang, Tie dye t-shirt, Incense, Guitar
-
-Design a small (width and height between 20 and 50) SVG for each of these icons.
 </Icons>
 </Parameters>
 

@@ -15,9 +15,16 @@ export function randomPermutation<T>(arr: T[], count: number): T[] {
   }
   return permutation;
 }
+export function randomElements<T>(arr: T[], count: number): T[] {
+  return Array.from({length: count}).map(() => arr[randomInt(arr.length)]);
+}
 
 export function randomInt(max: number): number {
   return Math.floor(Math.random() * max);
+}
+
+export function randomUniformIid(max: number, count: number) {
+  return Array.from({length: count}).map(() => max * Math.random());
 }
 
 export function parseAIResponse(aiResponse: string): Theme {
