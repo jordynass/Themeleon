@@ -2,8 +2,8 @@ import { ReactElement } from "react";
 import { Text, LayoutChangeEvent, View } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient'
 
-import "../global.css";
 import { CardContent, CardTheme } from "./shared/types";
+import { useTailwind } from "tailwind-rn";
 
 type Props = {
   theme: CardTheme,
@@ -12,10 +12,11 @@ type Props = {
 }
 
 export default function Card({theme, content, onLayout}: Props): ReactElement {
+  const tailwind = useTailwind();
   return (
-    <View className="max-w-lg">
+    <View style={tailwind("max-w-lg")}>
       <LinearGradient
-          className="p-3 rounded"
+          style={tailwind("p-3 rounded")}
           colors={theme.colors}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 0}}

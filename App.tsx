@@ -8,13 +8,22 @@ import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
 import { FakeDataClient } from './src/clients/data-client';
 
-import "./global.css";
 import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, getCardListHeight, parseAIResponse, randomPermutation } from './src/shared/utils';
 import { CardData, CardTheme } from './src/shared/types';
+import { TailwindProvider, useTailwind } from 'tailwind-rn';
+import utilities from './tailwind.json';
 
 const cardClient = new FakeDataClient();
 
 export default function App() {
+  return (
+    <TailwindProvider utilities={utilities}>
+      <AppImpl />
+    </TailwindProvider>
+  )
+}
+
+function AppImpl() {
   const [cardData, setCardData] = useState<CardData[]>([]);
   const [listHeightVisible, setListHeightVisible] = useState(0);
   const [listOffset, setListOffset] = useState(0);
@@ -25,6 +34,8 @@ export default function App() {
   const cardTheme = useRef<CardTheme>({colors: ['200,200,200', '150,150,150'], icons: []});
   const cancelCardLoads = useRef(false);
   const isLoadingCards = useRef(false);
+
+  const tailwind = useTailwind();
 
   useEffect(() => {
     loadCards(CARD_BATCH_SIZE * 2);
@@ -117,8 +128,8 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView className="flex-col flex-1 items-stretch justify-start p-4 gap-4">
-      <View className="flex-col gap-2 items-center">
+    <SafeAreaView style={{...tailwind("flex-col flex-1 items-stretch justify-start p-4"), gap: 16}}>
+      <View style={{...tailwind("flex-col items-center"), gap: 8}}>
         <TextInput label="Theme prompt" value={themeQuery} onChangeText={setThemeQuery} placeholder="Space" />
         <Button onPress={requestTheme} mode='contained' disabled={isLoadingTheme}>Update Visual Theme</Button>
       </View>
@@ -126,12 +137,11 @@ export default function App() {
           data={cardData}
           renderItem={({item}) => <Card onLayout={e => handleCardLayout(e, item.id)} key={item.id} theme={item.theme} content={item.content} />}
           keyExtractor={item => String(item.id)}
-          contentContainerClassName="flex-col flex-1 items-center justify-start px-5" 
-          contentContainerStyle={{ gap: CARD_GAP }}
+          contentContainerStyle={{ ...tailwind("flex-col flex-1 items-center justify-start px-5" ), gap: CARD_GAP }}
           onScroll={handleScroll}
           scrollEventThrottle={20} 
           onLayout={handleListLayout} />
-      <View className="flex-col items-center">
+      <View style={tailwind("flex-col items-center")}>
         <TextInput label="Gemini API Key" value={apiKey} onChangeText={setApiKey} secureTextEntry={true} />
       </View>
     </SafeAreaView>
