@@ -2,14 +2,14 @@ export type CardContent = {
   body: string,
 };
 
-export type CardTheme = {
+export type Theme = {
   colors: string[],
   icons: string[],
 };
 
 export type CardData = {
   id: number,
-  theme: CardTheme,
+  theme: Theme,
   content: CardContent,
   height: number,
 }

@@ -8,8 +8,8 @@ import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
 import { FakeDataClient } from './src/clients/data-client';
 
-import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, getCardListHeight, parseAIResponse, randomPermutation } from './src/shared/utils';
-import { CardData, CardTheme } from './src/shared/types';
+import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, getCardListHeight, parseAIResponse } from './src/shared/utils';
+import { CardData, Theme } from './src/shared/types';
 import { TailwindProvider, useTailwind } from 'tailwind-rn';
 import utilities from './tailwind.json';
 
@@ -31,7 +31,7 @@ function AppImpl() {
   const [apiKey, setApiKey] = useState('');
   const [isLoadingTheme, setIsLoadingTheme] = useState(false);
 
-  const cardTheme = useRef<CardTheme>({colors: ['200,200,200', '150,150,150'], icons: []});
+  const theme = useRef<Theme>({colors: ['200,200,200', '150,150,150'], icons: []});
   const cancelCardLoads = useRef(false);
   const isLoadingCards = useRef(false);
 
@@ -58,12 +58,9 @@ function AppImpl() {
     const newCardDataById = new Map<number, CardData>();
     for (let i = 0; i < newCardBodies.length; i++) {
       const body = newCardBodies[i];
-      const colors = cardTheme.current.colors.length > 1 ?
-          randomPermutation(cardTheme.current.colors, 3).map((rgbTriple: string) => `rgba(${rgbTriple},.3)`) :
-          [...cardTheme.current.colors, ...cardTheme.current.colors]
       const newCard = {
         id: nextId + i,
-        theme: {...cardTheme.current, colors},
+        theme: theme.current,
         content: {body},
         height: Infinity,
       }
@@ -117,7 +114,7 @@ function AppImpl() {
 
     try {
       const response = await themeClient.getThemeForPrompt(themeQuery);
-      cardTheme.current = parseAIResponse(response);
+      theme.current = parseAIResponse(response);
       setThemeQuery('');
       await AsyncStorage.setItem(GEMINI_API_LOCAL_STORAGE_KEY, apiKeyWithFallback);
     } catch (e) {

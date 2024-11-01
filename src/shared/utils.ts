@@ -1,4 +1,4 @@
-import { CardData, CardTheme } from "./types";
+import { CardData, Theme } from "./types";
 
 export const CARD_BATCH_SIZE = 10;
 export const CARD_GAP = 10;
@@ -20,7 +20,7 @@ export function randomInt(max: number): number {
   return Math.floor(Math.random() * max);
 }
 
-export function parseAIResponse(aiResponse: string): CardTheme {
+export function parseAIResponse(aiResponse: string): Theme {
   return {
     colors: getTags(aiResponse, 'Color'),
     icons: getTags(aiResponse, 'Icon'),
