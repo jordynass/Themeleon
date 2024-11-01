@@ -124,7 +124,7 @@ function AppImpl() {
   }
 
   return (
-    <SafeAreaView style={{...tailwind("flex-col flex-1 items-stretch justify-start p-4"), gap: 16}}>
+    <SafeAreaView style={{...tailwind("flex-col flex-1 items-stretch justify-start"), paddingTop: 12, gap: 16}}>
       <View style={{...tailwind("flex-col items-center"), gap: 8}}>
         <TextInput label="Theme prompt" value={themeQuery} onChangeText={setThemeQuery} placeholder="Space" />
         <Button onPress={requestTheme} mode='contained' disabled={isLoadingTheme}>Update Visual Theme</Button>
@@ -133,7 +133,7 @@ function AppImpl() {
           data={cardData}
           renderItem={({item}) => <Card onLayout={e => handleCardLayout(e, item.id)} key={item.id} theme={item.theme} content={item.content} />}
           keyExtractor={item => String(item.id)}
-          contentContainerStyle={{ ...tailwind("flex-col flex-1 items-center justify-start px-5" ), gap: CARD_GAP }}
+          contentContainerStyle={{ ...tailwind("flex-col flex-1 items-stretch justify-start" ), gap: CARD_GAP }}
           onScroll={handleScroll}
           scrollEventThrottle={20} 
           onLayout={handleListLayout} />

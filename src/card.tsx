@@ -16,15 +16,17 @@ export default function Card({theme, content, onLayout}: Props): ReactElement {
   const tailwind = useTailwind();
   const [colors] = useState<string[]>(generateColors(theme));
   return (
-    <View style={tailwind("max-w-lg")}>
-      <LinearGradient
-          style={tailwind("p-3 rounded")}
-          colors={colors}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 0}}
-          onLayout={onLayout}>
-        <Text>{content.body}</Text>
-      </LinearGradient>
+    <View style={tailwind("flex-col items-center")}>
+      <View style={tailwind("max-w-lg")}>
+        <LinearGradient
+            style={tailwind("p-3 rounded")}
+            colors={colors}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
+            onLayout={onLayout}>
+          <Text>{content.body}</Text>
+        </LinearGradient>
+      </View>
     </View>
   )
 }
