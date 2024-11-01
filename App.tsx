@@ -1,17 +1,18 @@
 import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, SafeAreaView, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
-import { GoogleAIClient } from './src/clients/ai-client';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { TailwindProvider, useTailwind } from 'tailwind-rn';
+import utilities from './tailwind.json';
 
 import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
 import { FakeDataClient } from './src/clients/data-client';
-
+import { GoogleAIClient } from './src/clients/ai-client';
 import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, getCardListHeight, parseAIResponse } from './src/shared/utils';
-import { CardData, Theme } from './src/shared/types';
-import { TailwindProvider, useTailwind } from 'tailwind-rn';
-import utilities from './tailwind.json';
+
+import type { CardData, Theme } from './src/shared/types';
 
 const cardClient = new FakeDataClient();
 
@@ -55,7 +56,6 @@ function AppImpl() {
 
     const nextId = cardData.length;
     const newCardData: CardData[] = [];
-    const newCardDataById = new Map<number, CardData>();
     for (let i = 0; i < newCardBodies.length; i++) {
       const body = newCardBodies[i];
       const newCard = {
@@ -65,7 +65,6 @@ function AppImpl() {
         height: Infinity,
       }
       newCardData.push(newCard);
-      newCardDataById.set(newCard.id, newCard);
     }
 
     if (cancelCardLoads.current) {

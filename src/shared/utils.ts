@@ -28,7 +28,7 @@ export function parseAIResponse(aiResponse: string): Theme {
 }
 
 export function getTags(xmlString: string, tagName: string): string[] {
-  const regex = new RegExp(`<${tagName}>(.*?)</${tagName}>`, 'gi');
+  const regex = new RegExp(`<${tagName}[^>]*>(.*?)</${tagName}>`, 'gims');
   return Array.from(xmlString.matchAll(regex)!).map(([, group]) => group);
 }
 
