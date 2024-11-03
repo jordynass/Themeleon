@@ -51,7 +51,7 @@ function generateIcons(theme: Theme): ReactNode[] {
   const {width, height} = Dimensions.get('window');
   const svgXmls = randomElements(theme.icons, ICONS_PER_CARD);
   const tops = randomUniformIid(height / 3, ICONS_PER_CARD);
-  const lefts = randomUniformIid(width - 80, ICONS_PER_CARD);
+  const lefts = randomUniformIid(width - 150, ICONS_PER_CARD);
   return svgXmls.map((svgXml, i) => (
     <SvgXml key={i} xml={svgXml} style={{position: 'absolute', top: tops[i], left: lefts[i], opacity: .3}}/>
   ));
