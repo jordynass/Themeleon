@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, useState } from "react";
+import { memo, ReactElement, ReactNode, useState } from "react";
 import { Text, LayoutChangeEvent, View, Dimensions, Image } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient'
 
@@ -13,7 +13,7 @@ type Props = {
   content: CardContent,
 }
 
-export default function Card({theme, content}: Props): ReactElement {
+function Card({theme, content}: Props): ReactElement {
   const tailwind = useTailwind();
   const [colors] = useState<string[]>(generateColors(theme));
   const [icons, setIcons] = useState<ReactNode[]>([]);
@@ -37,6 +37,8 @@ export default function Card({theme, content}: Props): ReactElement {
     </View>
   )
 }
+
+export default memo(Card);
 
 function generateColors(theme: Theme): string[] {
   return theme.colors.length > 1 ?
