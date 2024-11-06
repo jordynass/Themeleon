@@ -1,4 +1,4 @@
-import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, SafeAreaView, View } from 'react-native';
+import { FlatList, SafeAreaView, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +10,7 @@ import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
 import { FakeDataClient } from './src/clients/data-client';
 import { GoogleAIClient } from './src/clients/ai-client';
-import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, getCardListHeight, parseAIResponse } from './src/shared/utils';
+import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, parseAIResponse } from './src/shared/utils';
 
 import type { CardData, Theme } from './src/shared/types';
 import { LocalServerIconClient } from './src/clients/icon-client';
@@ -29,8 +29,6 @@ export default function App() {
 
 function AppImpl() {
   const [cardData, setCardData] = useState<CardData[]>([]);
-  const [listHeightVisible, setListHeightVisible] = useState(0);
-  const [listOffset, setListOffset] = useState(0);
   const [themeQuery, setThemeQuery] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [isLoadingTheme, setIsLoadingTheme] = useState(false);
@@ -45,8 +43,6 @@ function AppImpl() {
     loadCards(CARD_BATCH_SIZE * 2);
     return () => { cancelCardLoads.current = true };
   }, []);
-
-  const cardDataById = new Map<number, CardData>(cardData.map(cd => [cd.id, cd]));
 
   async function loadCards(batchSize: number = CARD_BATCH_SIZE) {
     if (isLoadingCards.current) {
@@ -65,7 +61,6 @@ function AppImpl() {
         id: nextId + i,
         theme: theme.current,
         content: {body},
-        height: Infinity,
       }
       newCardData.push(newCard);
     }
@@ -74,30 +69,6 @@ function AppImpl() {
       return;
     }
     setCardData([...cardData, ...newCardData]);
-  }
-
-  function handleCardLayout(e: LayoutChangeEvent, id: number) {
-    const cardHeight = e.nativeEvent.layout.height;
-
-    const card = cardDataById.get(id);
-    card!.height = cardHeight;
-    
-    if (listOffset + 2 * listHeightVisible > getCardListHeight(cardData)) {
-      loadCards();
-    }
-  }
-
-  function handleListLayout(e: LayoutChangeEvent) {
-    setListHeightVisible(e.nativeEvent.layout.height);
-  }
-
-  function handleScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
-    const newOffset = e.nativeEvent.contentOffset.y;
-    if (newOffset + 2 * listHeightVisible > getCardListHeight(cardData)) {
-      loadCards();
-    }
-
-    setListOffset(newOffset);
   }
 
   function handleNoApiKeyError() {
@@ -126,6 +97,10 @@ function AppImpl() {
     }
   }
 
+  function handleEndReached() {
+    loadCards();
+  }
+
   return (
     <SafeAreaView style={{...tailwind("flex-col flex-1 items-stretch justify-start"), paddingTop: 12, gap: 16}}>
       <View style={{...tailwind("flex-col items-center"), gap: 8}}>
@@ -134,12 +109,12 @@ function AppImpl() {
       </View>
       <FlatList
           data={cardData}
-          renderItem={({item}) => <Card onLayout={e => handleCardLayout(e, item.id)} key={item.id} theme={item.theme} content={item.content} />}
+          renderItem={({item}) => <Card key={item.id} theme={item.theme} content={item.content} />}
           keyExtractor={item => String(item.id)}
           contentContainerStyle={{ ...tailwind("flex-col flex-1 items-stretch justify-start" ), gap: CARD_GAP }}
-          onScroll={handleScroll}
-          scrollEventThrottle={20} 
-          onLayout={handleListLayout} />
+          scrollEventThrottle={20}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={1} />
       <View style={tailwind("flex-col items-center")}>
         <TextInput label="Gemini API Key" value={apiKey} onChangeText={setApiKey} secureTextEntry={true} />
       </View>

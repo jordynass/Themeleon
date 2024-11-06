@@ -11,10 +11,9 @@ const ICONS_PER_CARD = 6;
 type Props = {
   theme: Theme,
   content: CardContent,
-  onLayout: (event: LayoutChangeEvent) => void,
 }
 
-export default function Card({theme, content, onLayout}: Props): ReactElement {
+export default function Card({theme, content}: Props): ReactElement {
   const tailwind = useTailwind();
   const [colors] = useState<string[]>(generateColors(theme));
   const [icons, setIcons] = useState<ReactNode[]>([]);
@@ -31,8 +30,7 @@ export default function Card({theme, content, onLayout}: Props): ReactElement {
             style={tailwind("p-3 rounded")}
             colors={colors}
             start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}
-            onLayout={onLayout}>
+            end={{x: 1, y: 0}}>
           <Text>{content.body}</Text>
         </LinearGradient>
       </View>

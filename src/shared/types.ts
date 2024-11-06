@@ -11,5 +11,4 @@ export type CardData = {
   id: number,
   theme: Theme,
   content: CardContent,
-  height: number,
 }
