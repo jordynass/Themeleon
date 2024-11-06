@@ -1,12 +1,11 @@
 import { memo, ReactElement, ReactNode, useState } from "react";
-import { Text, LayoutChangeEvent, View, Dimensions, Image } from "react-native";
+import { Text, View, Dimensions, Image } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient'
 
 import { CardContent, Theme } from "./shared/types";
 import { useTailwind } from "tailwind-rn";
-import { ICON_SIZE, randomElements, randomPermutation, randomUniformIid } from "./shared/utils";
+import { ICON_SIZE, ICONS_PER_CARD, randomElements, randomPermutation, randomUniformIid } from "./shared/utils";
 
-const ICONS_PER_CARD = 6;
 
 type Props = {
   theme: Theme,
@@ -18,7 +17,7 @@ function Card({theme, content}: Props): ReactElement {
   const [colors] = useState<string[]>(generateColors(theme));
   const [icons, setIcons] = useState<ReactNode[]>([]);
 
-  function handleLayout(e: LayoutChangeEvent) {
+  function handleLayout() {
     setIcons(generateIcons(theme));
   }
   

@@ -1,10 +1,11 @@
-import { CardData, Theme } from "./types";
+import { Theme } from "./types";
 
 
 export const CARD_BATCH_SIZE = 10;
 export const CARD_GAP = 10;
 export const ICON_SIZE = 50;
 export const GEMINI_API_LOCAL_STORAGE_KEY = 'Themelon Gemini API Key';
+export const ICONS_PER_CARD = 4;
 
 export function randomPermutation<T>(arr: T[], count: number): T[] {
   count = Math.min(count, arr.length);
@@ -39,10 +40,4 @@ export function parseAIResponse(aiResponse: string): Theme {
 export function getTags(xmlString: string, tagName: string): string[] {
   const regex = new RegExp(`<${tagName}[^>]*>(.*?)</${tagName}>`, 'gims');
   return Array.from(xmlString.matchAll(regex)!).map(([, group]) => group);
-}
-
-export function getCardListHeight(cardData: CardData[]) {
-  const justCardContent = cardData.map(cd => cd.height ?? 0).reduce((sum, height) => sum += height, 0);
-  const gaps = (cardData.length - 1) * CARD_GAP;
-  return justCardContent + gaps;
 }

@@ -83,8 +83,7 @@ function AppImpl() {
     setIsLoadingTheme(true);
 
     try {
-      const response = await themeClient.getThemeForPrompt(themeQuery);
-      theme.current = parseAIResponse(response);
+      theme.current = await themeClient.getThemeForPrompt(themeQuery);
       setThemeQuery('');
       await AsyncStorage.setItem(GEMINI_API_LOCAL_STORAGE_KEY, apiKeyWithFallback);
     } catch (e) {
