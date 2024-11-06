@@ -52,11 +52,12 @@ function generateIcons(theme: Theme): ReactNode[] {
   const tops = randomUniformIid(height / 3, ICONS_PER_CARD);
   const lefts = randomUniformIid(width - ICON_SIZE, ICONS_PER_CARD);
   return iconUris.map((uri, i) => (
-    <Image key={i} source={{uri}} style={{
+    <Image key={i} source={{uri}} resizeMode="cover" style={{
         position: 'absolute',
         top: tops[i],
         left: lefts[i],
         opacity: .3,
-        resizeMode: 'contain', width: ICON_SIZE, height: ICON_SIZE }}/>
+        width: ICON_SIZE,
+        height: ICON_SIZE }}/>
     ));
 }
