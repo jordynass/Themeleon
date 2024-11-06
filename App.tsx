@@ -13,8 +13,11 @@ import { GoogleAIClient } from './src/clients/ai-client';
 import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, getCardListHeight, parseAIResponse } from './src/shared/utils';
 
 import type { CardData, Theme } from './src/shared/types';
+import { LocalServerIconClient } from './src/clients/icon-client';
 
 const cardClient = new FakeDataClient();
+
+const iconClient = new LocalServerIconClient();
 
 export default function App() {
   return (

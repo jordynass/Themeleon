@@ -22,6 +22,7 @@ export class GoogleAIClient extends AIClient {
   }
 }
 
+// jjjj USE OLD ICON PROMPT!
 function formatPromptForRequest(themePrompt: string): string {
   return `You are designing an app. Its visual theme is ${themePrompt}.
 The visual theme has the following parameters
@@ -37,10 +38,7 @@ in decreasing order of relevance.
 </Colors>
 
 <Icons>
-Come up with a few icons (3 to 5) associated theme of ${themePrompt} and design SVGs that a regular person
-can immediately identify. They should be as detailed as possible subject to the constraint of staying under
-5000 characters in total. The most important thing is the someone can immediately recognize the icon, so try to pick 
-icons that can be recognized by shape and color. Their widths and heights should be under 150 pixels. For instance,
+Names or brief descriptions of a few visual symbols (3 to 5) associated theme of ${themePrompt}.
 
 Ireland: Clover, Irish flag, Cabbage, Mountain, Emerald, Harp
 Water: Wave, Fish, Pool, Swimsuit, Bucket
@@ -55,9 +53,11 @@ It should be an XML object in the following format:
 <Color>0,140,69</Color>
 <Color>244,245,240</Color>
 <Color>205,33,42</Color>
-<Icon name="Boot"><svg height="130" width="150"...</svg></Icon>
-<Icon name="Pizza"><svg height="125" width="75"...</svg></Icon>
-<Icon name="Pasta"><svg height="40" width="140"...</svg></Icon>
-<Icon name="Gondola Boat"><svg height="30" width="45"...</svg></Icon>
+<Icon>Pizza slices</Icon>
+<Icon>Coliseum</Icon>
+<Icon>Boot</Icon>
+<Icon>Pasta</Icon>
+<Icon>Leaning Tower of Pisa</Icon>
+<Icon>Gondola boat</Icon>
 `;
 }

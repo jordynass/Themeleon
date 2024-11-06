@@ -1,11 +1,10 @@
 import { ReactElement, ReactNode, useState } from "react";
-import { Text, LayoutChangeEvent, View, Dimensions } from "react-native";
+import { Text, LayoutChangeEvent, View, Dimensions, Image } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient'
 
 import { CardContent, Theme } from "./shared/types";
 import { useTailwind } from "tailwind-rn";
-import { randomElements, randomPermutation, randomUniformIid } from "./shared/utils";
-import { SvgXml } from "react-native-svg";
+import { ICON_SIZE, randomElements, randomPermutation, randomUniformIid } from "./shared/utils";
 
 const ICONS_PER_CARD = 6;
 
@@ -49,10 +48,15 @@ function generateColors(theme: Theme): string[] {
 
 function generateIcons(theme: Theme): ReactNode[] {
   const {width, height} = Dimensions.get('window');
-  const svgXmls = randomElements(theme.icons, ICONS_PER_CARD);
+  const iconUris = randomElements(theme.icons, ICONS_PER_CARD);
   const tops = randomUniformIid(height / 3, ICONS_PER_CARD);
-  const lefts = randomUniformIid(width - 150, ICONS_PER_CARD);
-  return svgXmls.map((svgXml, i) => (
-    <SvgXml key={i} xml={svgXml} style={{position: 'absolute', top: tops[i], left: lefts[i], opacity: .3}}/>
-  ));
+  const lefts = randomUniformIid(width - ICON_SIZE, ICONS_PER_CARD);
+  return iconUris.map((uri, i) => (
+    <Image key={i} source={{uri}} style={{
+        position: 'absolute',
+        top: tops[i],
+        left: lefts[i],
+        opacity: .3,
+        resizeMode: 'contain', width: ICON_SIZE, height: ICON_SIZE }}/>
+    ));
 }

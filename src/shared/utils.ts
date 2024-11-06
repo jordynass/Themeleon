@@ -1,7 +1,9 @@
 import { CardData, Theme } from "./types";
 
+
 export const CARD_BATCH_SIZE = 10;
 export const CARD_GAP = 10;
+export const ICON_SIZE = 50;
 export const GEMINI_API_LOCAL_STORAGE_KEY = 'Themelon Gemini API Key';
 
 export function randomPermutation<T>(arr: T[], count: number): T[] {
