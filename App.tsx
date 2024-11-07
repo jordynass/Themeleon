@@ -30,8 +30,10 @@ function AppImpl() {
   const [cardData, setCardData] = useState<CardData[]>([]);
   const [themeQuery, setThemeQuery] = useState('');
   const [isLoadingTheme, setIsLoadingTheme] = useState(false);
+  const [theme, setTheme] = useState<Theme>({colors: ['200,200,200', '150,150,150'], iconUris: []});
+  const [offset, setOffset] = useState(0);
+  const [headerDimensions, setHeaderDimensions] = useState<{width: number, height: number}>();
 
-  const theme = useRef<Theme>({colors: ['200,200,200', '150,150,150'], iconUris: []});
   const cancelCardLoads = useRef(false);
   const isLoadingCards = useRef(false);
   const textInputRef = useRef<any>(null);
@@ -60,7 +62,7 @@ function AppImpl() {
       const body = newCardBodies[i];
       const newCard = {
         id: nextId + i,
-        theme: theme.current,
+        theme,
         content: {body},
       }
       newCardData.push(newCard);
@@ -75,8 +77,8 @@ function AppImpl() {
   async function requestTheme(themePrompt: string) {
     setIsLoadingTheme(true);
     try {
-      theme.current = await themeClient.getThemeForPrompt(themePrompt);
-      console.log(`Successfully fetched visual theme for ${themePrompt}:\n${JSON.stringify(theme.current, null, 2)}`);
+      setTheme(await themeClient.getThemeForPrompt(themePrompt));
+      console.log(`Successfully fetched new visual theme:\n${JSON.stringify(theme, null, 2)}`);
       setThemeQuery('');
     } catch (e) {
       console.error(`Failed to reach AI backend or parse response. Error:\n${e}`);
@@ -88,7 +90,7 @@ function AppImpl() {
   function handleRandomSuggestion() {
     setThemeQuery(randomElements(themeSuggestions as string[], 1)[0]);
     textInputRef.current!.focus();
-  }  
+  }
 
   return (
     <SafeAreaView style={tailwind("flex-col flex-1 items-stretch justify-start")}>
@@ -96,7 +98,8 @@ function AppImpl() {
           style={{...tailwind("flex-col items-stretch pb-4 pt-3 border-b border-solid"), gap: 8}}
           colors={RAINBOW}
           start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}>
+          end={{x: 1, y: 1}}
+          onLayout={e => setHeaderDimensions({width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height})}>
         <View style={tailwind("flex-row justify-center")}>
           <View style={tailwind("flex-row flex-grow max-w-lg")}>
             <TextInput
@@ -115,6 +118,10 @@ function AppImpl() {
             Suggest Random Theme
           </Button>
         </View>
+        {theme.prompt && <Text style={{...tailwind("absolute"),
+          top: ((offset ** .7) / 6) % headerDimensions!.height,
+          left: ((offset ** .9) / 4) % headerDimensions!.width,
+        }}>{theme.prompt}</Text>}
       </LinearGradient>
       <ImageBackground
           source={{uri: "./assets/marble.webp"}}
@@ -124,9 +131,10 @@ function AppImpl() {
             renderItem={({item}) => <Card key={item.id} theme={item.theme} content={item.content} />}
             keyExtractor={item => String(item.id)}
             contentContainerStyle={{...tailwind("flex-col flex-1 items-stretch justify-start"), paddingTop: CARD_GAP, gap: CARD_GAP }}
-            scrollEventThrottle={20}
+            scrollEventThrottle={1}
             onEndReached={() => loadCards(CARD_BATCH_SIZE)}
             onEndReachedThreshold={1}
+            onScroll={e => setOffset(e.nativeEvent.contentOffset.y)}
             showsVerticalScrollIndicator={false}
             style={tailwind("bg-white bg-opacity-75")} />
       </ImageBackground>
