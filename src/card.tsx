@@ -41,11 +41,14 @@ export default memo(Card);
 
 function generateColors(theme: Theme): string[] {
   return theme.colors.length > 1 ?
-      randomPermutation(theme.colors, 3).map((rgbTriple: string) => `rgba(${rgbTriple},.45)`) :
+      randomPermutation(theme.colors, 3).map((rgbTriple: string) => `rgba(${rgbTriple},.6)`) :
       [...theme.colors, ...theme.colors];
 }
 
 function generateIcons(theme: Theme): ReactNode[] {
+  if (theme.iconUris.length === 0) {
+    return [];
+  }
   const {width, height} = Dimensions.get('window');
   const iconUris = randomElements(theme.iconUris, ICONS_PER_CARD);
   const tops = randomUniformIid(height / 3, ICONS_PER_CARD);
