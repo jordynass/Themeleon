@@ -4,7 +4,7 @@ export type CardContent = {
 
 export type Theme = {
   colors: string[],
-  icons: string[],
+  iconUris: string[],
 };
 
 export type CardData = {

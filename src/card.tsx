@@ -47,7 +47,7 @@ function generateColors(theme: Theme): string[] {
 
 function generateIcons(theme: Theme): ReactNode[] {
   const {width, height} = Dimensions.get('window');
-  const iconUris = randomElements(theme.icons, ICONS_PER_CARD);
+  const iconUris = randomElements(theme.iconUris, ICONS_PER_CARD);
   const tops = randomUniformIid(height / 3, ICONS_PER_CARD);
   const lefts = randomUniformIid(width - ICON_SIZE, ICONS_PER_CARD);
   return iconUris.map((uri, i) => (
