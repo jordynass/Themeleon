@@ -2,6 +2,14 @@
   position: absolute
 }
 
+.h-full {
+  height: 100%
+}
+
+.w-full {
+  width: 100%
+}
+
 .max-w-lg {
   max-width: 32rem
 }
@@ -42,6 +50,36 @@
   border-radius: 0.25rem
 }
 
+.bg-red-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 202 202 / var(--tw-bg-opacity))
+}
+
+.bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity))
+}
+
+.bg-opacity-25 {
+  --tw-bg-opacity: 0.25
+}
+
+.bg-opacity-50 {
+  --tw-bg-opacity: 0.5
+}
+
+.bg-opacity-75 {
+  --tw-bg-opacity: 0.75
+}
+
 .p-3 {
   padding: 0.75rem
+}
+
+.pt-3 {
+  padding-top: 0.75rem
+}
+
+.pt-8 {
+  padding-top: 2rem
 }

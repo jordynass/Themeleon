@@ -1,4 +1,4 @@
-import { FlatList, SafeAreaView, View } from 'react-native';
+import { FlatList, ImageBackground, SafeAreaView, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 
 import { TailwindProvider, useTailwind } from 'tailwind-rn';
@@ -88,7 +88,7 @@ function AppImpl() {
   }
 
   return (
-    <SafeAreaView style={{...tailwind("flex-col flex-1 items-stretch justify-start"), paddingTop: 12, gap: 16}}>
+    <SafeAreaView style={{...tailwind("flex-col flex-1 items-stretch justify-start pt-3"), gap: 16}}>
       <View style={{...tailwind("flex-col items-stretch"), gap: 8}}>
         <View style={tailwind("flex-row justify-center")}>
           <View style={tailwind("flex-row flex-grow max-w-lg")}>
@@ -109,14 +109,20 @@ function AppImpl() {
           </Button>
         </View>
       </View>
-      <FlatList
-          data={cardData}
-          renderItem={({item}) => <Card key={item.id} theme={item.theme} content={item.content} />}
-          keyExtractor={item => String(item.id)}
-          contentContainerStyle={{...tailwind("flex-col flex-1 items-stretch justify-start" ), gap: CARD_GAP }}
-          scrollEventThrottle={20}
-          onEndReached={() => loadCards(CARD_BATCH_SIZE)}
-          onEndReachedThreshold={1} />
+      <ImageBackground
+          source={{uri: "./assets/marble.webp"}}
+          style={{...tailwind("flex-1 w-full h-full justify-center align-center")}}>
+        <FlatList
+            data={cardData}
+            renderItem={({item}) => <Card key={item.id} theme={item.theme} content={item.content} />}
+            keyExtractor={item => String(item.id)}
+            contentContainerStyle={{...tailwind("flex-col flex-1 items-stretch justify-start" ), gap: CARD_GAP }}
+            scrollEventThrottle={20}
+            onEndReached={() => loadCards(CARD_BATCH_SIZE)}
+            onEndReachedThreshold={1}
+            showsVerticalScrollIndicator={false}
+            style={tailwind("bg-white bg-opacity-75")} />
+      </ImageBackground>
     </SafeAreaView>
   );
 }

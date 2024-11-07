@@ -10,7 +10,7 @@ export class FakeDataClient extends DataClient {
   }
 
   private generateCardContent(): string {
-    const numCopies = Math.floor(Math.random() * this.maxCopies + 1);
+    const numCopies = 1 + Math.floor(Math.random() * this.maxCopies + 1);
     return (new Array(numCopies).fill(this.dummyContent)).join(' ');
   }
 
