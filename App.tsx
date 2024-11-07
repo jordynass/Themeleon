@@ -1,20 +1,20 @@
 import { FlatList, SafeAreaView, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { TailwindProvider, useTailwind } from 'tailwind-rn';
 import utilities from './tailwind.json';
 
 import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
-import { FakeDataClient } from './src/clients/data-client';
-import { GoogleAIClient } from './src/clients/ai-client';
-import { CARD_BATCH_SIZE, CARD_GAP, GEMINI_API_LOCAL_STORAGE_KEY, parseAIResponse } from './src/shared/utils';
+import { DataClient, FakeDataClient } from './src/clients/data-client';
+import { CARD_BATCH_SIZE, CARD_GAP } from './src/shared/utils';
 
 import type { CardData, Theme } from './src/shared/types';
+import { LocalServerThemeClient, ThemeClient } from './src/clients/theme-client';
 
-const cardClient = new FakeDataClient();
+
+const cardClient: DataClient = new FakeDataClient();
+const themeClient: ThemeClient = new LocalServerThemeClient();
 
 export default function App() {
   return (
@@ -27,10 +27,9 @@ export default function App() {
 function AppImpl() {
   const [cardData, setCardData] = useState<CardData[]>([]);
   const [themeQuery, setThemeQuery] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [isLoadingTheme, setIsLoadingTheme] = useState(false);
 
-  const theme = useRef<Theme>({colors: ['200,200,200', '150,150,150'], icons: []});
+  const theme = useRef<Theme>({colors: ['200,200,200', '150,150,150'], iconUris: []});
   const cancelCardLoads = useRef(false);
   const isLoadingCards = useRef(false);
 
@@ -68,24 +67,12 @@ function AppImpl() {
     setCardData([...cardData, ...newCardData]);
   }
 
-  function handleNoApiKeyError() {
-    console.error('No API key provided or found in local storage')
-  }
-
   async function requestTheme() {
-    const apiKeyWithFallback = apiKey || await AsyncStorage.getItem(GEMINI_API_LOCAL_STORAGE_KEY);
-    if (!apiKeyWithFallback) {
-      handleNoApiKeyError();
-      return;
-    }
-
-    const themeClient = new GoogleAIClient(apiKeyWithFallback);
     setIsLoadingTheme(true);
 
     try {
       theme.current = await themeClient.getThemeForPrompt(themeQuery);
       setThemeQuery('');
-      await AsyncStorage.setItem(GEMINI_API_LOCAL_STORAGE_KEY, apiKeyWithFallback);
     } catch (e) {
       console.error(`Failed to reach AI backend or parse response. Error:\n${e}`);
     } finally {
@@ -111,9 +98,6 @@ function AppImpl() {
           scrollEventThrottle={20}
           onEndReached={handleEndReached}
           onEndReachedThreshold={1} />
-      <View style={tailwind("flex-col items-center")}>
-        <TextInput label="Gemini API Key" value={apiKey} onChangeText={setApiKey} secureTextEntry={true} />
-      </View>
     </SafeAreaView>
   );
 }

@@ -19,7 +19,7 @@ export function randomPermutation<T>(arr: T[], count: number): T[] {
   return permutation;
 }
 export function randomElements<T>(arr: T[], count: number): T[] {
-  return Array.from({length: count}).map(() => arr[randomInt(arr.length)]);
+  return Array.from({length: count}, () => arr[randomInt(arr.length)]);
 }
 
 export function randomInt(max: number): number {
@@ -27,17 +27,10 @@ export function randomInt(max: number): number {
 }
 
 export function randomUniformIid(max: number, count: number) {
-  return Array.from({length: count}).map(() => max * Math.random());
-}
-
-export function parseAIResponse(aiResponse: string): Theme {
-  return {
-    colors: getTags(aiResponse, 'Color'),
-    icons: getTags(aiResponse, 'Icon'),
-  };
+  return Array.from({length: count}, () => max * Math.random());
 }
 
 export function getTags(xmlString: string, tagName: string): string[] {
   const regex = new RegExp(`<${tagName}[^>]*>(.*?)</${tagName}>`, 'gims');
-  return Array.from(xmlString.matchAll(regex)!).map(([, group]) => group);
+  return Array.from(xmlString.matchAll(regex)!, ([, group]) => group);
 }
