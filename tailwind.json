@@ -1,4 +1,14 @@
 {
+	"absolute": {
+		"style": {
+			"position": "absolute"
+		}
+	},
+	"flex": {
+		"style": {
+			"display": "flex"
+		}
+	},
 	"max-w-lg": {
 		"style": {
 			"maxWidth": 512
@@ -9,6 +19,16 @@
 			"flexGrow": 1,
 			"flexShrink": 1,
 			"flexBasis": "0%"
+		}
+	},
+	"flex-grow": {
+		"style": {
+			"flexGrow": 1
+		}
+	},
+	"flex-row": {
+		"style": {
+			"flexDirection": "row"
 		}
 	},
 	"flex-col": {
@@ -31,6 +51,21 @@
 			"justifyContent": "flex-start"
 		}
 	},
+	"justify-center": {
+		"style": {
+			"justifyContent": "center"
+		}
+	},
+	"justify-between": {
+		"style": {
+			"justifyContent": "space-between"
+		}
+	},
+	"justify-stretch": {
+		"style": {
+			"justifyContent": "stretch"
+		}
+	},
 	"rounded": {
 		"style": {
 			"borderTopLeftRadius": 4,
@@ -45,20 +80,6 @@
 			"paddingRight": 12,
 			"paddingBottom": 12,
 			"paddingLeft": 12
-		}
-	},
-	"p-4": {
-		"style": {
-			"paddingTop": 16,
-			"paddingRight": 16,
-			"paddingBottom": 16,
-			"paddingLeft": 16
-		}
-	},
-	"px-5": {
-		"style": {
-			"paddingLeft": 20,
-			"paddingRight": 20
 		}
 	}
 }
