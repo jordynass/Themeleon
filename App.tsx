@@ -7,10 +7,11 @@ import utilities from './tailwind.json';
 import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
 import { DataClient, FakeDataClient } from './src/clients/data-client';
-import { CARD_BATCH_SIZE, CARD_GAP } from './src/shared/utils';
+import { CARD_BATCH_SIZE, CARD_GAP, randomElements } from './src/shared/utils';
 
 import type { CardData, Theme } from './src/shared/types';
 import { LocalServerThemeClient, ThemeClient } from './src/clients/theme-client';
+import themeSuggestions from './src/shared/theme-suggestions';
 
 
 const cardClient: DataClient = new FakeDataClient();
@@ -32,6 +33,7 @@ function AppImpl() {
   const theme = useRef<Theme>({colors: ['200,200,200', '150,150,150'], iconUris: []});
   const cancelCardLoads = useRef(false);
   const isLoadingCards = useRef(false);
+  const textInputRef = useRef<any>(null);
 
   const tailwind = useTailwind();
 
@@ -80,23 +82,40 @@ function AppImpl() {
     }
   }
 
-  function handleEndReached() {
-    loadCards();
+  function handleRandomSuggestion() {
+    setThemeQuery(randomElements(themeSuggestions as string[], 1)[0]);
+    textInputRef.current!.focus();
   }
 
   return (
     <SafeAreaView style={{...tailwind("flex-col flex-1 items-stretch justify-start"), paddingTop: 12, gap: 16}}>
-      <View style={{...tailwind("flex-col items-center"), gap: 8}}>
-        <TextInput label="Theme prompt" value={themeQuery} onChangeText={setThemeQuery} placeholder="Space" />
-        <Button onPress={requestTheme} mode='contained' disabled={isLoadingTheme}>Update Visual Theme</Button>
+      <View style={{...tailwind("flex-col items-stretch"), gap: 8}}>
+        <View style={tailwind("flex-row justify-center")}>
+          <View style={tailwind("flex-row flex-grow max-w-lg")}>
+            <TextInput
+                label="Theme prompt"
+                value={themeQuery}
+                onChangeText={setThemeQuery}
+                onSubmitEditing={requestTheme}
+                placeholder="e.g. Space, Parties, Happiness"
+                ref={textInputRef}
+                style={tailwind("flex-grow")} />
+          </View>
+        </View>
+        <View style={{...tailwind("flex-row justify-center"), gap: 20}}>
+          <Button onPress={requestTheme} mode='contained' disabled={isLoadingTheme}>Update Visual Theme</Button>
+          <Button onPress={handleRandomSuggestion} mode='outlined' disabled={isLoadingTheme}>
+            Suggest Random Theme
+          </Button>
+        </View>
       </View>
       <FlatList
           data={cardData}
           renderItem={({item}) => <Card key={item.id} theme={item.theme} content={item.content} />}
           keyExtractor={item => String(item.id)}
-          contentContainerStyle={{ ...tailwind("flex-col flex-1 items-stretch justify-start" ), gap: CARD_GAP }}
+          contentContainerStyle={{...tailwind("flex-col flex-1 items-stretch justify-start" ), gap: CARD_GAP }}
           scrollEventThrottle={20}
-          onEndReached={handleEndReached}
+          onEndReached={() => loadCards(CARD_BATCH_SIZE)}
           onEndReachedThreshold={1} />
     </SafeAreaView>
   );

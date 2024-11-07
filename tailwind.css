@@ -1,9 +1,21 @@
+.absolute {
+  position: absolute
+}
+
 .max-w-lg {
   max-width: 32rem
 }
 
 .flex-1 {
   flex: 1 1 0%
+}
+
+.flex-grow {
+  flex-grow: 1
+}
+
+.flex-row {
+  flex-direction: row
 }
 
 .flex-col {
@@ -22,19 +34,14 @@
   justify-content: flex-start
 }
 
+.justify-center {
+  justify-content: center
+}
+
 .rounded {
   border-radius: 0.25rem
 }
 
 .p-3 {
   padding: 0.75rem
-}
-
-.p-4 {
-  padding: 1rem
-}
-
-.px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem
 }
