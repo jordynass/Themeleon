@@ -7,11 +7,12 @@ import utilities from './tailwind.json';
 import Card from './src/card';
 import { useEffect, useRef, useState } from 'react';
 import { DataClient, FakeDataClient } from './src/clients/data-client';
-import { CARD_BATCH_SIZE, CARD_GAP, randomElements } from './src/shared/utils';
+import { CARD_BATCH_SIZE, CARD_GAP, RAINBOW, randomElements } from './src/shared/utils';
 
 import type { CardData, Theme } from './src/shared/types';
 import { LocalServerThemeClient, ThemeClient } from './src/clients/theme-client';
 import themeSuggestions from './src/shared/theme-suggestions';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const cardClient: DataClient = new FakeDataClient();
@@ -85,11 +86,15 @@ function AppImpl() {
   function handleRandomSuggestion() {
     setThemeQuery(randomElements(themeSuggestions as string[], 1)[0]);
     textInputRef.current!.focus();
-  }
+  }  
 
   return (
-    <SafeAreaView style={{...tailwind("flex-col flex-1 items-stretch justify-start pt-3"), gap: 16}}>
-      <View style={{...tailwind("flex-col items-stretch"), gap: 8}}>
+    <SafeAreaView style={tailwind("flex-col flex-1 items-stretch justify-start")}>
+      <LinearGradient
+          style={{...tailwind("flex-col items-stretch pb-4 pt-3 border-b border-solid"), gap: 8}}
+          colors={RAINBOW}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 1}}>
         <View style={tailwind("flex-row justify-center")}>
           <View style={tailwind("flex-row flex-grow max-w-lg")}>
             <TextInput
@@ -108,7 +113,7 @@ function AppImpl() {
             Suggest Random Theme
           </Button>
         </View>
-      </View>
+      </LinearGradient>
       <ImageBackground
           source={{uri: "./assets/marble.webp"}}
           style={{...tailwind("flex-1 w-full h-full justify-center align-center")}}>

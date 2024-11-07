@@ -2,6 +2,15 @@ export const CARD_BATCH_SIZE = 10;
 export const CARD_GAP = 10;
 export const ICON_SIZE = 50;
 export const ICONS_PER_CARD = 4;
+export const RAINBOW = [
+  "rgba(255, 0, 0, 0.2)",    // Red
+  "rgba(255, 165, 0, 0.2)",  // Orange
+  "rgba(255, 255, 0, 0.2)",  // Yellow
+  "rgba(0, 128, 0, 0.2)",    // Green
+  "rgba(0, 0, 255, 0.2)",    // Blue
+  "rgba(75, 0, 130, 0.2)",   // Indigo
+  "rgba(238, 130, 238, 0.2)" // Violet
+];
 
 export function randomPermutation<T>(arr: T[], count: number): T[] {
   count = Math.min(count, arr.length);
