@@ -3,6 +3,7 @@ export type CardContent = {
 };
 
 export type Theme = {
+  prompt?: string,
   colors: string[],
   iconUris: string[],
 };

@@ -1,4 +1,4 @@
-import { FlatList, ImageBackground, SafeAreaView, View } from 'react-native';
+import { FlatList, ImageBackground, SafeAreaView, Text, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 
 import { TailwindProvider, useTailwind } from 'tailwind-rn';
@@ -39,7 +39,9 @@ function AppImpl() {
   const tailwind = useTailwind();
 
   useEffect(() => {
-    loadCards(CARD_BATCH_SIZE * 2);
+    loadCards();
+    const initialTheme = randomElements(themeSuggestions as string[], 1)[0];
+    requestTheme(initialTheme);
     return () => { cancelCardLoads.current = true };
   }, []);
 
@@ -70,11 +72,11 @@ function AppImpl() {
     setCardData([...cardData, ...newCardData]);
   }
 
-  async function requestTheme() {
+  async function requestTheme(themePrompt: string) {
     setIsLoadingTheme(true);
-
     try {
-      theme.current = await themeClient.getThemeForPrompt(themeQuery);
+      theme.current = await themeClient.getThemeForPrompt(themePrompt);
+      console.log(`Successfully fetched visual theme for ${themePrompt}:\n${JSON.stringify(theme.current, null, 2)}`);
       setThemeQuery('');
     } catch (e) {
       console.error(`Failed to reach AI backend or parse response. Error:\n${e}`);
@@ -101,14 +103,14 @@ function AppImpl() {
                 label="Theme prompt"
                 value={themeQuery}
                 onChangeText={setThemeQuery}
-                onSubmitEditing={requestTheme}
+                onSubmitEditing={() => requestTheme(themeQuery)}
                 placeholder="e.g. Space, Parties, Happiness"
                 ref={textInputRef}
                 style={tailwind("flex-grow")} />
           </View>
         </View>
         <View style={{...tailwind("flex-row justify-center"), gap: 20}}>
-          <Button onPress={requestTheme} mode='contained' disabled={isLoadingTheme}>Update Visual Theme</Button>
+          <Button onPress={() => requestTheme(themeQuery)} mode='contained' disabled={isLoadingTheme}>Update Visual Theme</Button>
           <Button onPress={handleRandomSuggestion} mode='outlined' disabled={isLoadingTheme}>
             Suggest Random Theme
           </Button>
@@ -121,7 +123,7 @@ function AppImpl() {
             data={cardData}
             renderItem={({item}) => <Card key={item.id} theme={item.theme} content={item.content} />}
             keyExtractor={item => String(item.id)}
-            contentContainerStyle={{...tailwind("flex-col flex-1 items-stretch justify-start" ), gap: CARD_GAP }}
+            contentContainerStyle={{...tailwind("flex-col flex-1 items-stretch justify-start"), paddingTop: CARD_GAP, gap: CARD_GAP }}
             scrollEventThrottle={20}
             onEndReached={() => loadCards(CARD_BATCH_SIZE)}
             onEndReachedThreshold={1}
