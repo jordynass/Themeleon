@@ -1,15 +1,15 @@
-import { FlatList, ImageBackground, SafeAreaView, Text, View } from 'react-native';
+import { FlatList, ImageBackground, SafeAreaView, Text, View, ViewToken } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 
 import { TailwindProvider, useTailwind } from 'tailwind-rn';
 import utilities from './tailwind.json';
 
 import Card from './src/card';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DataClient, FakeDataClient } from './src/clients/data-client';
 import { CARD_BATCH_SIZE, CARD_GAP, RAINBOW, randomElements } from './src/shared/utils';
 
-import type { CardData, Theme } from './src/shared/types';
+import type { CardData, Size, Theme } from './src/shared/types';
 import { LocalServerThemeClient, ThemeClient } from './src/clients/theme-client';
 import themeSuggestions from './src/shared/theme-suggestions';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -32,7 +32,9 @@ function AppImpl() {
   const [isLoadingTheme, setIsLoadingTheme] = useState(false);
   const [theme, setTheme] = useState<Theme>({colors: ['200,200,200', '150,150,150'], iconUris: []});
   const [offset, setOffset] = useState(0);
-  const [headerDimensions, setHeaderDimensions] = useState<{width: number, height: number}>();
+  const [headerSize, setHeaderSize] = useState<Size>();
+  const [themeTextSize, setThemeTextSize] = useState<Size>();
+  const [visibleTheme, setVisibleTheme] = useState<string>();
 
   const cancelCardLoads = useRef(false);
   const isLoadingCards = useRef(false);
@@ -92,6 +94,11 @@ function AppImpl() {
     textInputRef.current!.focus();
   }
 
+  const updateVisibleTheme = useCallback((info: {viewableItems: Array<ViewToken<CardData>>}) => {
+    const {viewableItems} = info;
+    setVisibleTheme(viewableItems[viewableItems.length - 1].item.theme.prompt);
+  }, [setVisibleTheme]);
+
   return (
     <SafeAreaView style={tailwind("flex-col flex-1 items-stretch justify-start")}>
       <LinearGradient
@@ -99,7 +106,7 @@ function AppImpl() {
           colors={RAINBOW}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
-          onLayout={e => setHeaderDimensions({width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height})}>
+          onLayout={e => setHeaderSize(e.nativeEvent.layout)}>
         <View style={tailwind("flex-row justify-center")}>
           <View style={tailwind("flex-row flex-grow max-w-lg")}>
             <TextInput
@@ -118,10 +125,12 @@ function AppImpl() {
             Suggest Random Theme
           </Button>
         </View>
-        {theme.prompt && <Text style={{...tailwind("absolute"),
-          top: ((offset ** .7) / 6) % headerDimensions!.height,
-          left: ((offset ** .9) / 4) % headerDimensions!.width,
-        }}>{theme.prompt}</Text>}
+        {visibleTheme && <Text 
+            onLayout={e => setThemeTextSize(e.nativeEvent.layout)}
+            style={{...tailwind("absolute"),
+              top: (headerSize!.height - (themeTextSize?.height ?? 0)) * (1 - Math.cos(offset/3000)) / 2,
+              left: (headerSize!.width - (themeTextSize?.width ?? 0)) * (1 - Math.cos(offset/4321)) / 2,
+            }}>{visibleTheme}</Text>}
       </LinearGradient>
       <ImageBackground
           source={{uri: "./assets/marble.webp"}}
@@ -135,6 +144,7 @@ function AppImpl() {
             onEndReached={() => loadCards(CARD_BATCH_SIZE)}
             onEndReachedThreshold={1}
             onScroll={e => setOffset(e.nativeEvent.contentOffset.y)}
+            onViewableItemsChanged={updateVisibleTheme}
             showsVerticalScrollIndicator={false}
             style={tailwind("bg-white bg-opacity-75")} />
       </ImageBackground>

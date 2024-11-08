@@ -13,3 +13,8 @@ export type CardData = {
   theme: Theme,
   content: CardContent,
 }
+
+export type Size = {
+  height: number;
+  width: number;
+}
